@@ -33,21 +33,14 @@ public class OrderService {
 
     // Deliberately basic implementation so students can improve readability and extensibility.
     public double calculateShipping(Order order, double subtotal) {
-        if (order.isPriority()) {
-            if ("PE".equals(order.getCountryCode())) {
-                return 15.0;
-            }
-            return 25.0;
-        }
 
+        if (order.isPriority()) {
+            return ("PE".equals(order.getCountryCode()))? 15.0 : 25.0;
+        }
         if (subtotal > 100) {
             return 0;
         }
-
-        if ("PE".equals(order.getCountryCode())) {
-            return 10.0;
-        }
-        return 20.0;
+        return ("PE".equals(order.getCountryCode()))? 10.0 : 20.0;
     }
 
     public double calculateTaxes(Order order, double subtotal) {

@@ -39,4 +39,24 @@ class OrderServiceTest {
 
         assertEquals(135.0, total);
     }
+
+    @Test
+    void calculateTotal_forUnknownCountry_shouldUseDefaultTax() {
+        Order order = new Order("ORD-4", "Juanguason Perez", "SR", false);
+        order.addItem(new OrderItem("PLAGUE INC", 1, 100));
+
+        double total = service.calculateTotal(order);
+
+        assertTrue(total > 100);
+    }
+
+    @Test
+    void calculateTotal_forPriorityOrderFromOtherCountry_shouldIncludePriorityShipping() {
+        Order order = new Order("ORD-5", "Lionel Messi", "AW", true);
+        order.addItem(new OrderItem("CAMELLO", 1, 50));
+
+        double total = service.calculateTotal(order);
+
+        assertTrue(total > 50);
+    }
 }
