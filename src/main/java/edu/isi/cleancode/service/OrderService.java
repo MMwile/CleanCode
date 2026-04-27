@@ -5,14 +5,17 @@ import edu.isi.cleancode.model.OrderItem;
 
 public class OrderService {
 
+    private TaxCalculator taxCalculator = new TaxCalculator();
+    private ShippingCalculator shippingCalculator = new ShippingCalculator();
+
     public String generateSummary(Order order) {
         double subtotal = 0;
         for (OrderItem item : order.getItems()) {
             subtotal += item.subtotal();
         }
 
-        double shipping = calculateShipping(order, subtotal);
-        double taxes = calculateTaxes(order, subtotal);
+        double shipping = shippingCalculator.calculate(order.getCountryCode(), order.isPriority(), subtotal);
+        double taxes = taxCalculator.calculate(order.getCountryCode(), subtotal);
         double total = subtotal + shipping + taxes;
 
         return "Order " + order.getId() + " for " + order.getCustomerName()
@@ -28,32 +31,8 @@ public class OrderService {
             subtotal += item.subtotal();
         }
 
-        return round2(subtotal + calculateShipping(order, subtotal) + calculateTaxes(order, subtotal));
-    }
-
-    // Deliberately basic implementation so students can improve readability and extensibility.
-    public double calculateShipping(Order order, double subtotal) {
-
-        if (order.isPriority()) {
-            return ("PE".equals(order.getCountryCode()))? 15.0 : 25.0;
-        }
-        if (subtotal > 100) {
-            return 0;
-        }
-        return ("PE".equals(order.getCountryCode()))? 10.0 : 20.0;
-    }
-
-    public double calculateTaxes(Order order, double subtotal) {
-        if ("HN".equals(order.getCountryCode())) {
-            return round2(subtotal * 0.15);
-        }
-        if ("PE".equals(order.getCountryCode())) {
-            return round2(subtotal * 0.18);
-        }
-        if ("CL".equals(order.getCountryCode())) {
-            return round2(subtotal * 0.19);
-        }
-        return round2(subtotal * 0.15);
+        return round2(subtotal + shippingCalculator.calculate(order.getCountryCode(), order.isPriority(), subtotal)
+                                + taxCalculator.calculate(order.getCountryCode(), subtotal));
     }
 
     private double round2(double amount) {
